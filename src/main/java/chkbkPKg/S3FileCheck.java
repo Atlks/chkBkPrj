@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class S3FileCheck {
 
@@ -44,13 +43,14 @@ public class S3FileCheck {
         String s3Path = "s3://amzn-s3-dbbackup/elasticsearch-snapshots/index.latest";
         String bucket = parseBucket(s3Path);
         String key = parseKey(s3Path);
+
         String bucket1 = "amzn-s3-dbbackup";
+
 
 
         String iso = getBktime4es(bucket, key, s3);
         System.out.println("=============esbk: " + iso);
 //      //  System.out.println(iso);
-
 
         String prefix = "wltPrj_Aws_MysqlBk/";
 
@@ -124,6 +124,7 @@ public class S3FileCheck {
 //        System.out.println("LastModified: " + latest.lastModified());
         return  toTimeIsoFmt(latest.lastModified());
     }
+
 
 
     private static String getBktime4wlt( String bucket,String prefix, S3Client s3) {
