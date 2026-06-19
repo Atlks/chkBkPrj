@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class S3FileCheck {
 
@@ -43,16 +44,87 @@ public class S3FileCheck {
         String s3Path = "s3://amzn-s3-dbbackup/elasticsearch-snapshots/index.latest";
         String bucket = parseBucket(s3Path);
         String key = parseKey(s3Path);
+        String bucket1 = "amzn-s3-dbbackup";
+
 
         String iso = getBktime4es(bucket, key, s3);
         System.out.println("=============esbk: " + iso);
 //      //  System.out.println(iso);
 
-        String bucket1 = "amzn-s3-dbbackup";
+
         String prefix = "wltPrj_Aws_MysqlBk/";
 
         System.out.println("==============wltBk,"+getBktime4wlt(bucket1,prefix,s3));
+        System.out.println("==============dcPgBk,"+getWlgBktimeLast(bucket1,"dc3tx/dtssbk/basebackups_005/",s3));
+
+
+        System.out.println("==============dcDrsbk,"+getDrsBktimeLast(bucket1,"dc3drs/datacenter/__palo_repository_s3_repo/",s3));
+
+
+
     }
+
+    private static String getDrsBktimeLast(String bucket, String prefix, S3Client s3) {
+
+        // 1️⃣ 拉取所有对象（分页处理）
+        ListObjectsV2Request request = ListObjectsV2Request.builder()
+                .bucket(bucket)
+                .prefix(prefix)
+                .build();
+
+
+        //获取最后一个子文件夹
+
+//        List<String> folders = s3.listObjectsV2Paginator(request)
+//                .stream()
+//                .flatMap(r -> r.contents().stream())
+//                .map(S3Object::key)
+//                .filter(key -> key.endsWith("UTCp8/"))
+//                .toList();
+//       //返回此子文件名称
+//        return folders.isEmpty() ? null : folders.getLast();
+       // String prefix = "dc3drs/datacenter/__palo_repository_s3_repo/";
+
+        List<String> names = s3.listObjectsV2(ListObjectsV2Request.builder()
+                        .bucket(bucket)
+                        .prefix(prefix)
+                        .delimiter("/")
+                        .build())
+                .commonPrefixes()
+                .stream()
+                .map(CommonPrefix::prefix)
+                .map(p -> p.substring(prefix.length(), p.length() - 1)) // 去掉前缀 + 最后 /
+                .toList();
+
+
+            return  names.get(names.size()-1);
+
+    }
+
+
+    private static String getWlgBktimeLast( String bucket,String prefix, S3Client s3) {
+        // 1️⃣ 拉取所有对象（分页处理）
+        ListObjectsV2Request request = ListObjectsV2Request.builder()
+                .bucket(bucket)
+                .prefix(prefix)
+                .build();
+
+
+
+
+        S3Object latest = s3.listObjectsV2Paginator(request).stream()
+                .flatMap(r -> r.contents().stream())
+                .filter(o -> o.key().endsWith(".json"))
+                .max(Comparator.comparing(S3Object::lastModified))
+                .orElse(null);
+
+        // 3️⃣ 输出结果
+//        System.out.println("Latest file:");
+         System.out.println("Key: " + latest.key());
+//        System.out.println("LastModified: " + latest.lastModified());
+        return  toTimeIsoFmt(latest.lastModified());
+    }
+
 
     private static String getBktime4wlt( String bucket,String prefix, S3Client s3) {
         // 1️⃣ 拉取所有对象（分页处理）
