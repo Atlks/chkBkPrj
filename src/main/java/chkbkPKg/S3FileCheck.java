@@ -12,10 +12,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class S3FileCheck {
@@ -58,46 +55,65 @@ public class S3FileCheck {
         System.out.println("==============dcPgBk,"+getWlgBktimeLast(bucket1,"dc3tx/dtssbk/basebackups_005/",s3));
 
 
+
+                System.out.println("==============boyinPgBk,"+getWlgBktimeLast(bucket1,"dc4bbinPgBk/basebackups_005/",s3));
+
+
+        System.out.println("==============kaosiPgBk,"+getWlgBktimeLast(bucket1,"kaosiBk/basebackups_005/",s3));
+
+
+        System.out.println("==============lvcht10PgBk,"+getWlgBktimeLast(bucket1,"lvcht10PgBk/basebackups_005/",s3));
+
+        System.out.println("==============lvcht10ArchdbBkV2,"+getWlgBktimeLast(bucket1,"lvcht10ArchdbBkV2/basebackups_005/",s3));
+
+
+
+
         System.out.println("==============dcDrsbk,"+getDrsBktimeLast(bucket1,"dc3drs/datacenter/__palo_repository_s3_repo/",s3));
 
+
+        System.out.println("==============boyinDrsbk,"+getDrsBktimeLast(bucket1,"dc4bbin_drs_bk/__palo_repository_dc4bbin_repo/",s3));
 
 
     }
 
     private static String getDrsBktimeLast(String bucket, String prefix, S3Client s3) {
 
+        System.out.println("fun getDrsBktimeLast(bkt="+bucket+",prfx="+prefix);
         // 1️⃣ 拉取所有对象（分页处理）
+
+
+       //只获取一级对象
+        //delimiter="/" 的作用是：
+        //告诉 S3：
+        //“遇到 / 就不要往下展开了”
         ListObjectsV2Request request = ListObjectsV2Request.builder()
                 .bucket(bucket)
                 .prefix(prefix)
+                .delimiter("/")
                 .build();
 
 
-        //获取最后一个子文件夹
+        List<String> dirs=new ArrayList<>();
+        //print dir
+        s3.listObjectsV2Paginator(request)
+                .stream()
+                .flatMap(r -> r.commonPrefixes().stream())
+                .forEach(p -> {
+                  //  System.out.println(p.prefix());
+                    dirs.add(p.prefix());
+                });
 
-//        List<String> folders = s3.listObjectsV2Paginator(request)
+//        List<S3Object> jsons = s3.listObjectsV2Paginator(request)
 //                .stream()
 //                .flatMap(r -> r.contents().stream())
-//                .map(S3Object::key)
-//                .filter(key -> key.endsWith("UTCp8/"))
+//                .filter(o -> o.key().endsWith(".json"))
 //                .toList();
-//       //返回此子文件名称
-//        return folders.isEmpty() ? null : folders.getLast();
-       // String prefix = "dc3drs/datacenter/__palo_repository_s3_repo/";
 
-        List<String> names = s3.listObjectsV2(ListObjectsV2Request.builder()
-                        .bucket(bucket)
-                        .prefix(prefix)
-                        .delimiter("/")
-                        .build())
-                .commonPrefixes()
-                .stream()
-                .map(CommonPrefix::prefix)
-                .map(p -> p.substring(prefix.length(), p.length() - 1)) // 去掉前缀 + 最后 /
-                .toList();
+        String last = dirs.get(dirs.size() - 1);
 
 
-            return  names.get(names.size()-1);
+            return  last.substring(prefix.length());
 
     }
 
@@ -107,6 +123,7 @@ public class S3FileCheck {
         ListObjectsV2Request request = ListObjectsV2Request.builder()
                 .bucket(bucket)
                 .prefix(prefix)
+                .delimiter("/")
                 .build();
 
 
