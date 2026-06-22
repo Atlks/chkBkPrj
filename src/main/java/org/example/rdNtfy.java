@@ -5,7 +5,7 @@ import java.io.File;
 public class rdNtfy {
 
     public static void main(String[] args) {
-        listFiles("/storage/emulated/0/Android/data/com.aaapkg/files");
+        listFiles("~/storage/shared/Android/data/com.aaapkg/files");
     }
 
     //列出文件
