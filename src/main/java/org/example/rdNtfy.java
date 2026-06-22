@@ -5,7 +5,7 @@ import java.io.File;
 public class rdNtfy {
 
     public static void main(String[] args) {
-        listFiles("~/storage/shared/Download/aNtfy");
+        listFiles("/storage/emulated/0/Download/aNtfy");
     }
 
     //列出文件
