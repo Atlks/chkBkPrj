@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 
 //。。。
+//cd
+//cd src/chkBkPrj
+
 public class rdNtfy {
 
     public static void main(String[] args) throws IOException {
@@ -12,9 +15,11 @@ public class rdNtfy {
     }
 
     private static void playMp3(String f) throws IOException {
+        System.out.println("fun playMp3(f="+f);
         ProcessBuilder pb =
                 new ProcessBuilder("mpv", f);
         pb.start();
+        System.out.println("endfun playMp3");
     }
 
     //列出文件
