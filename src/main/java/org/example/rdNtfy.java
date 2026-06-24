@@ -19,14 +19,22 @@ public class rdNtfy {
 //        ProcessBuilder pb =
 //                new ProcessBuilder("mpv", f);
 //        pb.start();
-        Process p =
-                new ProcessBuilder(
-                        "sh",
-                        "-c",
-                        "mpv /storage/emulated/0/Alarms/alm_lowBtry.mp3"
-                ).start();
+//        Process p =
+//                new ProcessBuilder(
+//                        "sh",
+//                        "-c",
+//                        "mpv /storage/emulated/0/Alarms/alm_lowBtry.mp3"
+//                ).start();
+//
+//        System.out.println(p.waitFor());
 
-        System.out.println(p.waitFor());
+        new ProcessBuilder(
+                "mpv",
+                "--no-terminal",
+                f
+        ).inheritIO()
+                .start()
+                .waitFor();
         System.out.println("endfun playMp3");
     }
 
