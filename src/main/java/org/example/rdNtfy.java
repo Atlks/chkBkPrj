@@ -1,11 +1,20 @@
 package org.example;
 
 import java.io.File;
+import java.io.IOException;
+
 //。。。
 public class rdNtfy {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         listFiles("/storage/emulated/0/Download/aNtfy");
+        playMp3("/storage/emulated/0/Alarms/alm_lowBtry.mp3");
+    }
+
+    private static void playMp3(String f) throws IOException {
+        ProcessBuilder pb =
+                new ProcessBuilder("mpv", f);
+        pb.start();
     }
 
     //列出文件
