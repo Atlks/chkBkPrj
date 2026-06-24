@@ -9,16 +9,24 @@ import java.io.IOException;
 
 public class rdNtfy {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         listFiles("/storage/emulated/0/Download/aNtfy");
         playMp3("/storage/emulated/0/Alarms/alm_lowBtry.mp3");
     }
 
-    private static void playMp3(String f) throws IOException {
+    private static void playMp3(String f) throws  Exception {
         System.out.println("fun playMp3(f="+f);
-        ProcessBuilder pb =
-                new ProcessBuilder("mpv", f);
-        pb.start();
+//        ProcessBuilder pb =
+//                new ProcessBuilder("mpv", f);
+//        pb.start();
+        Process p =
+                new ProcessBuilder(
+                        "sh",
+                        "-c",
+                        "mpv /storage/emulated/0/Alarms/alm_lowBtry.mp3"
+                ).start();
+
+        System.out.println(p.waitFor());
         System.out.println("endfun playMp3");
     }
 
